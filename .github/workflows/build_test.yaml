@@ -12,6 +12,10 @@ on:
   schedule:
     - cron: '0 15 * * 2'  # Runs at 15:00 (3pm) UTC every Tuesday
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     if: github.event_name != 'push' || github.event.pull_request == null
@@ -42,7 +46,7 @@ jobs:
         fetch-depth: 0
         submodules: recursive
     - name: Set GIT_VERSION
-      run: echo "GIT_VERSION=$(git describe --tags)" >> $GITHUB_ENV
+      run: echo \"GIT_VERSION=$(git describe --tags)\" >> $GITHUB_ENV
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
     - name: Build Dockerfile
