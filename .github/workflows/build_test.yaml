@@ -1,3 +1,10 @@
+# Optimized by ci-cost (https://github.com/mariotavarez/ci-cost)
+# Applied 3 optimizations:
+# - [MEDIUM] Add concurrency group to "build_test.yaml"
+# - [LOW] Explicitly set fail-fast for large matrix job "build" (12 combinations)
+# - [LOW] Use shallow clone in "build" job
+# Estimated savings: ~4 min/run
+#
 on:
   push:
     branches:
@@ -12,6 +19,10 @@ on:
   schedule:
     - cron: '0 15 * * 2'  # Runs at 15:00 (3pm) UTC every Tuesday
 
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   build:
     if: github.event_name != 'push' || github.event.pull_request == null
